@@ -1,50 +1,54 @@
 import threading
 
-class SumCalculatorThread(threading.Thread):
-    def __init__(self, numbers, result_lock, result_list):
+class CalculateSumThread(threading.Thread):
+    def __init__(self, numbers):
         threading.Thread.__init__(self)
         self.numbers = numbers
-        self.result_lock = result_lock
-        self.result_list = result_list
+        self.sum = 0
 
     def run(self):
-        # Calculate the sum of numbers in the assigned range
-        thread_sum = sum(self.numbers)
+        for number in self.numbers:
+            self.sum += number
 
-        # Acquire lock before updating the shared result_list
-        with self.result_lock:
-            self.result_list.append(thread_sum)
+def calculate_sum(numbers):
+    thread = CalculateSumThread(numbers)
+    thread.start()
+    thread.join()
+    return thread.sum
 
-def calculate_sum_using_threads(numbers, num_threads):
-    result_lock = threading.Lock()
-    result_list = []
-
-    # Split the numbers into chunks for each thread
-    chunk_size = len(numbers) // num_threads
-    chunks = [numbers[i:i + chunk_size] for i in range(0, len(numbers), chunk_size)]
-
-    # Create and start threads
-    threads = []
-    for chunk in chunks:
-        thread = SumCalculatorThread(chunk, result_lock, result_list)
-        thread.start()
-        threads.append(thread)
-
-    # Wait for all threads to finish
-    for thread in threads:
-        thread.join()
-
-    # Calculate the final sum from the result_list
-    final_sum = sum(result_list)
-
-    return final_sum
+def main():
+    numbers = []
+    while True:
+        number = input("Enter a number (or write 'stop' to finish): ")
+        if number.lower() == 'stop':
+            break
+        else:
+            numbers.append(int(number))
+    sum = calculate_sum(numbers)
+    print("Sum of the numbers:", sum)
 
 if __name__ == "__main__":
-    # Example usage
-    n = int(input("Enter the number: "))
-    numbers = list(range(1, n + 1))
-    num_threads = 4
+    main()
+    
+    
+# for fix the number of elements
+import threading
 
-    result = calculate_sum_using_threads(numbers, num_threads)
+def calculate_sum(numbers):
+    return sum(numbers)
 
-    print(f"Sum of {n} numbers using {num_threads} threads: {result}")
+def main():
+    numbers = []
+    while len(numbers) < 5: # change the value to the desired number of elements
+        number = input("Enter a number: ")
+        numbers.append(int(number))
+
+    thread = threading.Thread(target=calculate_sum, args=(numbers,))
+    thread.start()
+    thread.join()
+
+    sum = calculate_sum(numbers)
+    print("Sum of the numbers:", sum)
+
+if __name__ == "__main__":
+    main()
