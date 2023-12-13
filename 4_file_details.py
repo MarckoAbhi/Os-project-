@@ -32,7 +32,7 @@ def main():
         print("Usage: python file_details.py <file_name>")
         sys.exit(1)
 
-    file_name = sys.argv[1]
+    file_name = sys.argv[0]
     get_file_details(file_name)
 
 if __name__ == "__main__":
